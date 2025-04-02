@@ -17,8 +17,15 @@ produtos = soup.find_all('div', class_="poly-card__content") # separando os prod
 for produto in produtos: # pegando o nome, preço e link de cada produto.
     nome = produto.find('h3', class_="poly-component__title-wrapper").get_text()
     valor = produto.find('span', class_="andes-money-amount__fraction").get_text()
+    if "." in valor:
+        valor = valor.replace(".","")
+    try:
+        centavos = produto.find('span', class_="andes-money-amount__cents andes-money-amount__cents--superscript-24").get_text()
+    except:
+        centavos = "00"
+    valor_total = float(valor + "." + centavos)
     link = produto.find('a').get('href')
-    linha = pd.DataFrame([{'Nome' :nome, 'Valor' :valor, 'Link' : link}]) # transformadno o resultado em uma linha em dataframe
+    linha = pd.DataFrame([{'Nome' :nome, 'Valor' :valor_total, 'Link' : link}]) # transformadno o resultado em uma linha em dataframe
     df = pd.concat([df,linha], ignore_index=True) # adicionando a linha no dataframe de cada produto encontrado.
 df.to_excel("pesquisa.xlsx", index=False) # Salvando a em planilha em excel com o resultado.
 print(df)
